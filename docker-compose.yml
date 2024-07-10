@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/btc_trading
+      - SPRING_DATASOURCE_USERNAME=your_username
+      - SPRING_DATASOURCE_PASSWORD=your_password
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=btc_trading
+      - POSTGRES_USER=your_username
+      - POSTGRES_PASSWORD=your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

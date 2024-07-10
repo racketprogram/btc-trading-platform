@@ -1,0 +1,186 @@
+openapi: 3.0.0
+info:
+  title: BTC Trading Platform API
+  description: API for a Bitcoin trading platform
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      tags:
+        - users
+      parameters:
+        - in: query
+          name: name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User created successfully
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+
+  /users/{id}:
+    delete:
+      summary: Soft delete a user
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+
+  /transactions/buy:
+    post:
+      summary: Buy BTC
+      tags:
+        - transactions
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: btcAmount
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: BTC bought successfully
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad request
+
+  /transactions/sell:
+    post:
+      summary: Sell BTC
+      tags:
+        - transactions
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: btcAmount
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: BTC sold successfully
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Bad request
+
+  /transactions/{userId}:
+    get:
+      summary: Get user's transaction history
+      tags:
+        - transactions
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Transaction history retrieved successfully
+          content:
+            application/json:    
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '404':
+          description: User not found
+
+  /transactions/btc/price:
+    get:
+      summary: Get current BTC price
+      tags:
+        - transactions
+      responses:
+        '200':
+          description: Current BTC price
+          content:
+            application/json:    
+              schema:
+                type: number
+                format: double
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        usdBalance:
+          type: number
+          format: double
+        btcBalance:
+          type: number
+          format: double
+        deleted:
+          type: boolean
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
+        type:
+          type: string
+          enum: [BUY, SELL]
+        btcAmount:
+          type: number
+          format: double
+        usdAmount:
+          type: number
+          format: double
+        btcPrice:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
